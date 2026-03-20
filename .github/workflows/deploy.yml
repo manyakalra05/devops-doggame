@@ -21,7 +21,7 @@ jobs:
     - name: Step 3 - Copy all project files (BROKEN)
       run: |
         rsync -av --exclude='build' --exclude='.git' --exclude='.github' ./ build/
-        cp index2.html build/
+        
 
     - name: Step 4 - Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
