@@ -1,25 +1,29 @@
-name: Build Website
+name: Build and Deploy Website
 
 on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Step 1 - Get code
       uses: actions/checkout@v3
 
-    - name: Step 2 - Show files
-      run: ls
-
-    - name: Step 3 - Create build folder
+    - name: Step 2 - Create build folder
       run: mkdir build
 
-    - name: Step 4 - Copy website files
+    - name: Step 3 - Copy website files
       run: cp index.html build/
 
-    - name: Step 5 - Show build folder
-      run: ls build
+    - name: Step 4 - Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+        publish_branch: gh-pages
