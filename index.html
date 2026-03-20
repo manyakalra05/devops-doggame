@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Pixel Pet Paradise</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        --primary: #ff6b6b;
+        --secondary: #4ecdc4;
+        --accent: #ffe66d;
+        --dark: #292f36;
+        --light: #f7fff7;
+      }
+
+      body {
+        font-family: "Press Start 2P", cursive;
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        text-align: center;
+        color: var(--dark);
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .container {
+        background-color: rgba(247, 255, 247, 0.9);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border: 8px solid var(--dark);
+
+        /* Centering */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 90vw;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      h1 {
+        color: var(--primary);
+        text-shadow: 3px 3px 0 var(--dark);
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      #pet-container {
+        width: 25vw;
+        max-width: 128px;
+        height: 25vw;
+        max-height: 128px;
+        margin: 20px auto;
+        position: relative;
+        background-color: var(--light);
+        border-radius: 15px;
+        border: 5px solid var(--dark);
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      #pet-image {
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+        object-fit: contain;
+        transition: transform 0.2s;
+      }
+
+      #pet-image:hover {
+        transform: scale(1.05);
+      }
+
+      .stats-container {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .stat-bar {
+        margin: 10px;
+        width: 150px;
+      }
+
+      .stat-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 0.8rem;
+      }
+
+      .bar-container {
+        height: 20px;
+        border: 3px solid var(--dark);
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: var(--light);
+      }
+
+      .bar-progress {
+        height: 100%;
+        width: 0%;
+        transition: width 0.5s ease, background-color 0.3s;
+      }
+
+      #happiness-progress {
+        background-color: #4caf50;
+      }
+
+      #hunger-progress {
+        background-color: #ff6b6b;
+      }
+
+      #energy-progress {
+        background-color: #4ecdc4;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      button {
+        background-color: var(--dark);
+        border: none;
+        color: var(--light);
+        padding: 12px 25px;
+        text-align: center;
+        font-size: 1rem;
+        margin: 5px;
+        cursor: pointer;
+        font-family: "Press Start 2P", cursive;
+        border-radius: 50px;
+        transition: all 0.3s;
+        box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      button:active {
+        transform: translateY(2px);
+        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+      }
+
+      button::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+      }
+
+      button:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(0, 0);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(20, 20);
+          opacity: 0;
+        }
+      }
+
+      #pet-btn {
+        background-color: var(--primary);
+      }
+
+      #feed-btn {
+        background-color: var(--secondary);
+      }
+
+      #play-btn {
+        background-color: var(--accent);
+        color: var(--dark);
+      }
+
+      #clean-btn {
+        background-color: #a78bfa;
+      }
+
+      #sleep-btn {
+        background-color: #7c3aed;
+      }
+
+      #reset-btn {
+        background-color: #ef4444;
+      }
+
+      .inventory {
+        margin-top: 30px;
+        padding: 15px;
+        background-color: var(--dark);
+        border-radius: 15px;
+        color: var(--light);
+      }
+
+      .inventory h2 {
+        color: var(--accent);
+        margin-top: 0;
+      }
+
+      .items {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .item {
+        width: 60px;
+        height: 60px;
+        background-color: var(--light);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 3px solid transparent;
+      }
+
+      .item:hover {
+        transform: scale(1.1);
+        border-color: var(--accent);
+      }
+
+      .item img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--dark);
+        color: var(--light);
+        padding: 15px 25px;
+        border-radius: 50px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.9rem;
+      }
+
+      .show {
+        opacity: 1;
+      }
+
+      .particle {
+        position: absolute;
+        background-color: var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 10px;
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        #pet-container {
+          width: 64px;
+          height: 64px;
+        }
+
+        button {
+          padding: 10px 15px;
+          font-size: 0.8rem;
+        }
+
+        .container {
+          padding: 10px;
+          max-width: 95vw;
+        }
+
+        #pet-container {
+          width: 64px;
+          height: 64px;
+        }
+
+        button {
+          padding: 10px 15px;
+          font-size: 0.75rem;
+        }
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css?family=Press+Start+2P"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Pixel Pet Paradise</h1>
+
+      <div id="notification" class="notification"></div>
+
+      <div id="pet-container">
+        <img id="pet-image" src="assets/idle_1.png" alt="Pixel Pet" />
+      </div>
+
+      <div class="stats-container">
+        <div class="stat-bar">
+          <div class="stat-label">
+            <span>Happiness</span>
+            <span id="happiness-value">50%</span>
+          </div>
+          <div class="bar-container">
+            <div
+              id="happiness-progress"
+              class="bar-progress"
+              style="width: 50%"
+            ></div>
+          </div>
+        </div>
+
+        <div class="stat-bar">
+          <div class="stat-label">
+            <span>Hunger</span>
+            <span id="hunger-value">50%</span>
+          </div>
+          <div class="bar-container">
+            <div
+              id="hunger-progress"
+              class="bar-progress"
+              style="width: 50%"
+            ></div>
+          </div>
+        </div>
+
+        <div class="stat-bar">
+          <div class="stat-label">
+            <span>Energy</span>
+            <span id="energy-value">50%</span>
+          </div>
+          <div class="bar-container">
+            <div
+              id="energy-progress"
+              class="bar-progress"
+              style="width: 50%"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="pet-btn">
+          <i class="fas fa-hand-holding-heart"></i> Pet
+        </button>
+        <button id="feed-btn"><i class="fas fa-utensils"></i> Feed</button>
+        <button id="play-btn"><i class="fas fa-gamepad"></i> Play</button>
+        <button id="sleep-btn"><i class="fas fa-moon"></i> Sleep</button>
+        <button id="reset-btn"><i class="fas fa-redo"></i> Reset</button>
+      </div>
+
+      <div class="inventory">
+        <h2>Inventory</h2>
+        <div class="items">
+          <div class="item" data-item="toy">
+            <img src="assets/toy.png" alt="Toy" />
+          </div>
+          <div class="item" data-item="food">
+            <img src="assets/food.png" alt="Food" />
+          </div>
+          <div class="item" data-item="medicine">
+            <img src="assets/medicine.png" alt="Medicine" />
+          </div>
+          <div class="item" data-item="ball">
+            <img src="assets/ball.png" alt="Ball" />
+          </div>
+          <div class="item" data-item="hat">
+            <img src="assets/hat.png" alt="Hat" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="pet-sound" src="assets/sounds/pet.wav" preload="auto"></audio>
+    <audio id="feed-sound" src="assets/sounds/eat.wav" preload="auto"></audio>
+    <audio id="play-sound" src="assets/sounds/play.wav" preload="auto"></audio>
+    <audio
+      id="sleep-sound"
+      src="assets/sounds/sleep.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="clean-sound"
+      src="assets/sounds/clean.wav"
+      preload="auto"
+    ></audio>
+    <audio
+      id="evolve-sound"
+      src="assets/sounds/evolve.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="notification-sound"
+      src="assets/sounds/notification.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="bg-music"
+      loop
+      src="assets/sounds/bg-music.wav"
+      preload="auto"
+    ></audio>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
+<!-- Update 2024-11-06T06:18:44+05:30 -->
+<!-- Update 2024-11-06T10:42:44+05:30 -->
+<!-- Update 2024-11-11T09:14:03+05:30 -->
+<!-- Update 2024-11-24T17:42:13+05:30 -->
+<!-- Update 2024-11-26T11:13:18+05:30 -->
+<!-- Update 2024-11-26T17:24:18+05:30 -->
+<!-- Update 2024-12-22T11:21:22+05:30 -->
+<!-- Update 2025-01-01T06:12:26+05:30 -->
+<!-- Update 2025-01-01T05:42:26+05:30 -->
+<!-- Update 2025-04-15T17:54:43+05:30 -->
+<!-- Update 2025-04-16T08:01:45+05:30 -->
+<!-- Update 2025-04-19T16:19:46+05:30 -->
+<!-- Update 2025-04-22T09:43:49+05:30 -->
+<!-- Update 2025-04-22T14:17:49+05:30 -->
+<!-- Update 2025-04-23T06:19:50+05:30 -->
+<!-- Update 2025-05-07T17:16:51+05:30 -->
+<!-- Update 2025-05-22T12:26:54+05:30 -->
+<!-- Update 2025-06-04T10:29:57+05:30 -->
+<!-- Update 2025-06-20T12:30:00+05:30 -->
+<!-- Update 2025-07-14T13:24:04+05:30 -->
+<!-- Update 2025-09-12T11:58:14+05:30 -->
+<!-- Update 2025-09-22T17:00:18+05:30 -->
+<!-- Update 2025-09-22T18:30:18+05:30 -->
+<!-- Update 2025-09-22T12:22:18+05:30 -->
+<!-- Update 2025-09-26T17:14:20+05:30 -->
+<!-- Update 2025-10-23T19:12:28+05:30 -->
+<!-- Update 2024-11-04T17:04:59+05:30 -->
+<!-- Update 2024-11-06T07:11:10+05:30 -->
+<!-- Update 2024-11-30T11:45:18+05:30 -->
+<!-- Update 2024-12-12T08:29:20+05:30 -->
+<!-- Update 2024-12-20T09:43:29+05:30 -->
+<!-- Update 2024-12-21T13:30:30+05:30 -->
+<!-- Update 2024-12-23T13:31:33+05:30 -->
+<!-- Update 2024-12-23T17:05:33+05:30 -->
+<!-- Update 2025-01-03T14:23:38+05:30 -->
+<!-- Update 2025-01-09T07:08:45+05:30 -->
+<!-- Update 2025-01-09T06:04:45+05:30 -->
+<!-- Update 2025-01-10T10:03:46+05:30 -->
+<!-- Update 2025-01-10T14:04:46+05:30 -->
+<!-- Update 2025-02-11T05:50:07+05:30 -->
+<!-- Update 2025-02-25T16:16:13+05:30 -->
+<!-- Update 2025-03-27T09:20:30+05:30 -->
+<!-- Update 2025-04-01T07:30:33+05:30 -->
+<!-- Update 2025-04-10T19:07:39+05:30 -->
+<!-- Update 2025-04-14T06:48:41+05:30 -->
+<!-- Update 2025-04-14T14:38:41+05:30 -->
+<!-- Update 2025-04-16T16:25:43+05:30 -->
+<!-- Update 2025-05-15T08:31:50+05:30 -->
+<!-- Update 2025-05-17T13:43:54+05:30 -->
+<!-- Update 2025-05-21T07:03:55+05:30 -->
+<!-- Update 2025-05-22T13:28:57+05:30 -->
+<!-- Update 2025-06-04T15:36:01+05:30 -->
+<!-- Update 2025-06-25T07:27:12+05:30 -->
+<!-- Update 2025-06-27T13:35:14+05:30 -->
+<!-- Update 2025-06-28T06:02:15+05:30 -->
+<!-- Update 2025-06-29T13:25:17+05:30 -->
+<!-- Update 2025-06-30T15:32:19+05:30 -->
+<!-- Update 2025-07-07T07:39:22+05:30 -->
+<!-- Update 2025-07-07T14:53:22+05:30 -->
+<!-- Update 2025-07-21T10:31:28+05:30 -->
+<!-- Update 2025-08-04T11:13:36+05:30 -->
+<!-- Update 2025-08-05T19:18:37+05:30 -->
+<!-- Update 2025-08-12T17:42:40+05:30 -->
+<!-- Update 2025-08-17T15:57:45+05:30 -->
+<!-- Update 2025-08-20T10:56:49+05:30 -->
+<!-- Update 2025-08-21T17:07:51+05:30 -->
+<!-- Update 2025-08-22T17:47:52+05:30 -->
+<!-- Update 2025-08-23T18:04:54+05:30 -->
+<!-- Update 2025-09-22T15:41:08+05:30 -->
+<!-- Update 2025-10-10T15:39:16+05:30 -->
+<!-- Update 2025-10-14T11:08:21+05:30 -->
+<!-- Update 2025-10-14T08:09:21+05:30 -->
