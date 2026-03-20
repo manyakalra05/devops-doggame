@@ -1,28 +1,19 @@
-name: CI/CD Pipeline
+name: Learn Pipeline
 
 on:
   push:
     branches: ["main"]
 
-permissions:
-  contents: write   
-
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: Step 1
+      run: echo "Code pushed"
 
-    - name: Prepare deploy folder
-      run: |
-        mkdir public
-        rsync -av --exclude='.git' --exclude='.github' ./ public/
+    - name: Step 2
+      run: echo "Robot is working"
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
-        publish_branch: gh-pages
+    - name: Step 3
+      run: echo "Pipeline complete"
