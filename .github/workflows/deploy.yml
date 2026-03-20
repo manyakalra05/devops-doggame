@@ -1,38 +1,69 @@
-name: Build and Deploy Website
+name: Advanced CI/CD Pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "dev"]
 
 permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  pipeline:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Step 1 - Get code
+    # 🟢 STEP 1 - Checkout
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Step 2 - Create build folder
-      run: mkdir build
+    # 🟢 STEP 2 - Show files
+    - name: Show project structure
+      run: ls -R
 
-    - name: Step 3 - Copy all project files
-      run: rsync -av --exclude='build' --exclude='.git' --exclude='.github' ./ build/
-
-    - name: Step 4 - Security Check
+    # 🟢 STEP 3 - Lint check (basic)
+    - name: Lint HTML (basic check)
       run: |
-        echo "Checking for sensitive files..."
-        if [ -f ".env" ]; then
-          echo "❌ .env file found! Deployment stopped."
+        if grep -q "<script>" index.html; then
+          echo "⚠️ Inline JS detected (not best practice)"
+        fi
+        echo "✅ Lint step complete"
+
+    # 🟢 STEP 4 - Simulated test
+    - name: Run tests
+      run: |
+        echo "Running tests..."
+        if grep -q "error" script.js; then
+          echo "❌ Found 'error' in JS file"
           exit 1
         fi
-        echo "✅ No sensitive files found"
+        echo "✅ Tests passed"
 
-    - name: Step 5 - Deploy to GitHub Pages
+    # 🔐 STEP 5 - Security check
+    - name: Security scan
+      run: |
+        echo "Checking for secrets..."
+        if [ -f ".env" ]; then
+          echo "❌ .env file detected!"
+          exit 1
+        fi
+        echo "✅ Security passed"
+
+    # 🟡 STEP 6 - Build
+    - name: Build project
+      run: |
+        mkdir build
+        rsync -av --exclude='build' --exclude='.git' --exclude='.github' ./ build/
+        echo "✅ Build complete"
+
+    # 🔵 STEP 7 - Conditional Deploy (ONLY main branch)
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
         publish_branch: gh-pages
+
+    # 🔴 STEP 8 - Post-deploy log
+    - name: Final status
+      run: echo "🚀 Pipeline completed successfully!"
