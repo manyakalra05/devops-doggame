@@ -1,19 +1,25 @@
-name: Learn Pipeline
+name: Build Website
 
 on:
   push:
     branches: ["main"]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Step 1
-      run: echo "Code pushed"
+    - name: Step 1 - Get code
+      uses: actions/checkout@v3
 
-    - name: Step 2
-      run: echo "Robot is working"
+    - name: Step 2 - Show files
+      run: ls
 
-    - name: Step 3
-      run: echo "Pipeline complete"
+    - name: Step 3 - Create build folder
+      run: mkdir build
+
+    - name: Step 4 - Copy website files
+      run: cp index.html build/
+
+    - name: Step 5 - Show build folder
+      run: ls build
