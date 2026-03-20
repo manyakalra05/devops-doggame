@@ -5,21 +5,21 @@ on:
     branches: ["main"]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # CI Step (you can expand later)
-    - name: Simulate build step
-      run: echo "Building project..."
+    - name: Prepare files
+      run: |
+        mkdir public
+        cp -r * public || true
 
-    # CD Step
-    - name: Deploy to GitHub Pages
+    - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
+        publish_dir: ./public
         publish_branch: gh-pages
