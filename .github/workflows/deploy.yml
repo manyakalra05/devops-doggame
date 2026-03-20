@@ -18,12 +18,19 @@ jobs:
     - name: Step 2 - Create build folder
       run: mkdir build
 
-    - name: Step 3 - Copy all project files (BROKEN)
-      run: |
-        rsync -av --exclude='build' --exclude='.git' --exclude='.github' ./ build/
-        
+    - name: Step 3 - Copy all project files
+      run: rsync -av --exclude='build' --exclude='.git' --exclude='.github' ./ build/
 
-    - name: Step 4 - Deploy to GitHub Pages
+    - name: Step 4 - Security Check
+      run: |
+        echo "Checking for sensitive files..."
+        if [ -f ".env" ]; then
+          echo "❌ .env file found! Deployment stopped."
+          exit 1
+        fi
+        echo "✅ No sensitive files found"
+
+    - name: Step 5 - Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
